@@ -1,17 +1,24 @@
-import pygame
-from pygame.locals import *
-
-from OpenGL.GL import *
-from OpenGL.GLU import *
-from OpenGL.GLUT import *
-
-from Basura import Basura
-
-import random
-import math
-from Textures import Texture
-from Car import Car
+import requests
 from Llanta import Llanta
+from Car import Car
+from Textures import Texture
+from incinerator import Incinerator
+import math
+import random
+from Basura import Basura
+from OpenGL.GLUT import *
+from OpenGL.GLU import *
+from OpenGL.GL import *
+from pygame.locals import *
+import pygame
+
+
+URL_BASE = "http://localhost:5100"
+r = requests.post(URL_BASE + "/games", allow_redirects=False)
+
+LOCATION = r.headers["Location"]
+print(LOCATION)
+lista = r.json()
 
 screen_width = 500
 screen_height = 500
@@ -33,20 +40,30 @@ Y_MIN = -500
 Y_MAX = 500
 Z_MIN = -500
 Z_MAX = 500
-DimBoard = 200
+
+DimBoard = 210
+
+factor = 20
 
 pygame.init()
-
+'''
 Cars = []
-nCars = 10
+nCars = 5
 
 basuras = []
-nbasuras = 20
 
+basuras_recogidas = []
+
+nbasuras = 25
+
+'''
+incinerator_lista = []
 textures = []
 
-
-
+# Variables para el movimiento del plano
+plane_x = 0
+plane_z = 0
+plane_speed = 5  # Ajusta la velocidad de movimiento
 
 
 def Axis():
@@ -72,6 +89,12 @@ def Axis():
 
     glLineWidth(1.0)
 
+
+bots = {}
+basuras = {}
+# print(lista)
+
+
 def Init():
     screen = pygame.display.set_mode(
         (screen_width, screen_height), DOUBLEBUF | OPENGL)
@@ -83,26 +106,41 @@ def Init():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(EYE_X, EYE_Y, EYE_Z, CENTER_X, CENTER_Y, CENTER_Z, UP_X, UP_Y, UP_Z)
+    gluLookAt(EYE_X, EYE_Y, EYE_Z, CENTER_X,
+              CENTER_Y, CENTER_Z, UP_X, UP_Y, UP_Z)
     glClearColor(0, 0, 0, 0)
     glEnable(GL_DEPTH_TEST)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
-    # Definir y cargar las texturas aquí
+    # Definir y cargar las texturas
     textures.append(Texture("textura.bmp"))
     textures.append(Texture("creeper.bmp"))
+    textures.append(Texture("texturabasura.bmp"))
 
-    for i in range(nbasuras):
-        random_x = random.uniform(-DimBoard, DimBoard)
-        random_z = random.uniform(-DimBoard, DimBoard)
-        basuras.append(Basura(random_x, 10, random_z, 15))
+    print("Lista:0", lista[0])
 
-    for i in range(nCars):
-        Cars.append(Car(DimBoard, 3.0, textures))  # Pasa la lista de texturas como argumento
+    # print("\nLista:1", lista[1])
+    aux = Incinerator(0,0,15)
+    incinerator_lista.append(aux)
+    for agent in lista[0]:
+        car = Car(agent["x"]*factor-DimBoard,
+                  agent["z"]*factor-DimBoard, textures)
+        bots[agent["id"]] = car
+
+    for agent in lista[1]:
+        basura = Basura(agent["x"]*factor-DimBoard,
+                        agent["z"]*factor-DimBoard, textures)
+        basuras[agent["id"]] = basura
+
 
 def display():
+    response = requests.get(URL_BASE + LOCATION)
+    lista = response.json()
+    print(lista[0])
+    print(URL_BASE+LOCATION)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     Axis()
+    glTranslatef(plane_x, 0, plane_z)
     glEnable(GL_TEXTURE_2D)  # Habilita la textura
     glBindTexture(GL_TEXTURE_2D, textures[0].id)  # Bind la textura cargada
 
@@ -120,16 +158,29 @@ def display():
 
     glTexCoord2f(0, 1)  # Coordenadas de textura para el vértice 4
     glVertex3d(DimBoard, 0, -DimBoard)
+
     glEnd()
 
     glDisable(GL_TEXTURE_2D)  # Deshabilita la textura
 
-    for obj in Cars:
+    incinerator_lista[0].draw()
+    for bs in basuras.values():
+        glColor(1, 1, 1)
+        bs.draw()
+
+    for obj in bots.values():
         glColor(1, 1, 1)
         obj.draw()
-        obj.update()
-        
-        # Crea y dibuja las cuatro llantas debajo del carro
+
+    for agent in lista[0]:
+        bots[agent["id"]].update(
+            agent["x"]*factor-DimBoard, agent["z"]*factor-DimBoard)
+        print(agent["x"], agent["z"])
+    for agent in lista[1]:
+        basuras[agent["id"]].update(
+            agent["x"]*factor-DimBoard, agent["z"]*factor-DimBoard)
+
+    '''# Crea y dibuja las cuatro llantas debajo del carro
         front_left_wheel = Llanta(obj.Position[0] - 10, obj.Position[2] - 10)
         front_right_wheel = Llanta(obj.Position[0] - 10, obj.Position[2] + 10)
         rear_left_wheel = Llanta(obj.Position[0] + 10, obj.Position[2] - 10)
@@ -144,19 +195,63 @@ def display():
         front_left_wheel.update(obj.Position)
         front_right_wheel.update(obj.Position)
         rear_left_wheel.update(obj.Position)
-        rear_right_wheel.update(obj.Position)
-        
-        for bs in basuras:       
-            bs.draw()
+        rear_right_wheel.update(obj.Position)'''
+
+
+'''
+        for basura in basuras:
+            if (abs(obj.Position[0]) < 1 or abs(obj.Position[2]) < 1) and basura.id == obj.basura_recogida and obj.check_collision(basura):
+                basuras.remove(basura)
+                obj.ocupado = False  # El robot ya no está ocupado
+
+            if not obj.ocupado and obj.check_collision(basura) and basura.id not in basuras_recogidas:
+                new_basura_y = obj.Position[1] + obj.Size / 2 + basura.Size / 2
+                basura.Position = [obj.Position[0],
+                                   new_basura_y, obj.Position[2]]
+                # Marcar al robot como ocupado y pasar el ID de la basura
+                obj.recoger_basura(basura.id)
+                basuras_recogidas.append(basura.id)
+
+            if basura.id == obj.basura_recogida and obj.check_collision(basura):
+                new_basura_y = obj.Position[1] + obj.Size / 2 + basura.Size / 2
+                basura.Position = [obj.Position[0],
+                                   new_basura_y, obj.Position[2]]
+'''
 
 
 def main():
+    global EYE_X, EYE_Y, EYE_Z, CENTER_X, CENTER_Y, CENTER_Z
+    # Inicializamos el ángulo de rotación a 45 grados en radianes
+    angle = math.radians(45)
+
+    radius = 400  # Radio para la rotación
+
     Init()
     done = False
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w:
+                    EYE_Y += plane_speed
+                    CENTER_Y += plane_speed
+                elif event.key == pygame.K_s:
+                    EYE_Y -= plane_speed
+                    CENTER_Y -= plane_speed
+                elif event.key == pygame.K_a:
+                    angle += plane_speed / 10  # Aumentar el ángulo de rotación
+                elif event.key == pygame.K_d:
+                    angle -= plane_speed / 40  # Disminuir el ángulo de rotación
+
+        # Calculamos las nuevas coordenadas de la cámara
+        EYE_X = CENTER_X + radius * math.cos(angle)
+        EYE_Z = CENTER_Z + radius * math.sin(angle)
+
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        gluLookAt(EYE_X, EYE_Y, EYE_Z, CENTER_X,
+                  CENTER_Y, CENTER_Z, UP_X, UP_Y, UP_Z)
 
         display()
 
@@ -164,6 +259,7 @@ def main():
         pygame.time.wait(10)
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()

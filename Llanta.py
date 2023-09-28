@@ -5,15 +5,17 @@ from OpenGL.GLUT import *
 
 import random
 import math
-class Llanta:
-    def __init__(self, x, z):
-        self.x = x
-        self.z = z
 
-    def draw(self):
+
+class Llanta:
+    def __init__(llanta, x, z):
+        llanta.x = x
+        llanta.z = z
+
+    def draw(llanta):
         glPushMatrix()
-        glColor3f(0.0, 0.0, 0.0)  # Color de la llanta (negro)
-        glTranslatef(self.x, 10, self.z)  # Posición de la llanta debajo del carro
+        glColor3f(0.0, 0.0, 0.0)  # Color de la llanta 
+        glTranslatef(llanta.x, 10, llanta.z)  # Posición de la llanta debajo del carro
 
         num_segments = 100  # Número de segmentos para aproximar el círculo
         radius = 5  # Radio de la llanta
@@ -29,8 +31,8 @@ class Llanta:
 
         glPopMatrix()
 
-    def update(self, car_position):
+    def update(llanta, car_position):
         # Actualiza la posición de la llanta junto con el carro
         
-        self.x = car_position[0]
-        self.z = car_position[2]
+        llanta.x = car_position[0]
+        llanta.z = car_position[2]
