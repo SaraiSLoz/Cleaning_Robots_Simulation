@@ -2,7 +2,7 @@ from OpenGL.GL import *
 
 class Basura:
     def __init__(basura, posx, posz,textures):
-        basura.Position = (posx, 1, posz)
+        basura.Position = (posx, 6, posz)
         #basura.Size = size
         basura.id = id
         basura.textures = textures  # Asigna la lista de texturas
@@ -97,7 +97,7 @@ class Basura:
         glDisable(GL_TEXTURE_2D)  # Deshabilita la textura
 
     def update(self, posx, posz):
-        self.Position = (posx, 1,posz)
+        self.Position = (posx, 6,posz)
 
     def draw(basura):
         glPushMatrix()
@@ -106,7 +106,7 @@ class Basura:
         glTranslatef(basura.Position[0], basura.Position[1], basura.Position[2])
         glScaled(20, 20, 20)
             
-        basura.draw_textured_trash(0, 0, 0, 0.5)
+        basura.draw_textured_trash(0, 0, 0, 0.4)
         glPopMatrix()
         
     

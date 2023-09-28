@@ -5,6 +5,7 @@ from Textures import Texture
 import math
 import random
 from Basura import Basura
+from incinerator import Incinerator
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 from OpenGL.GL import *
@@ -18,7 +19,6 @@ r = requests.post(URL_BASE + "/games", allow_redirects=False)
 LOCATION = r.headers["Location"]
 print(LOCATION)
 lista = r.json()
-
 screen_width = 500
 screen_height = 500
 FOVY = 60.0
@@ -56,8 +56,11 @@ basuras_recogidas = []
 nbasuras = 25
 
 '''
+burning = 0
+not_burning = 1
 textures = []
-
+color_negro = (0.0, 0.0, 0.0)
+color_rojo = (1.0, 0.0, 0.0)
 # Variables para el movimiento del plano
 plane_x = 0
 plane_z = 0
@@ -90,6 +93,7 @@ def Axis():
 
 bots = {}
 basuras = {}
+incin = {}
 # print(lista)
 
 
@@ -129,8 +133,14 @@ def Init():
                         agent["z"]*factor-DimBoard, textures)
         basuras[agent["id"]] = basura
 
+    for agent in lista[2]:
+        incinerador = Incinerator(agent["x"]*factor-DimBoard,
+                                  agent["z"]*factor-DimBoard, color_negro)
+        incin[agent["id"]] = incinerador
+
 
 def display():
+    coords_inc = []
     response = requests.get(URL_BASE + LOCATION)
     lista = response.json()
     print(lista[0])
@@ -168,13 +178,34 @@ def display():
         glColor(1, 1, 1)
         obj.draw()
 
+    for inc in incin.values():
+        glColor(1, 1, 1)
+        inc.draw()
     for agent in lista[0]:
         bots[agent["id"]].update(
             agent["x"]*factor-DimBoard, agent["z"]*factor-DimBoard)
-        print(agent["x"],agent["z"])
+        print(agent["x"], agent["z"])
+
+    for agent in lista[2]:
+        coords_inc = incin[agent["id"]].Position
+        if agent["condition"] == burning:
+            incin[agent["id"]].update_state(color_rojo)
+        else:
+            incin[agent["id"]].update_state(color_negro)
+
     for agent in lista[1]:
-        basuras[agent["id"]].update(
-            agent["x"]*factor-DimBoard, agent["z"]*factor-DimBoard)
+        agent_id = agent['id']
+        if agent_id in basuras:
+            basuras[agent_id].update(
+                agent["x"] * factor - DimBoard, agent["z"] * factor - DimBoard)
+            basura_position = basuras[agent_id].Position
+            # Check if the basura is within a certain range of coordinates
+            if (coords_inc[0] - 1 <= basura_position[0] <= coords_inc[0] + 1) and \
+                    (coords_inc[2] - 1 <= basura_position[2] <= coords_inc[2] + 1):
+                # If within range, delete the basura
+                del basuras[agent_id]
+
+                # Update the basura's position
 
     '''# Crea y dibuja las cuatro llantas debajo del carro
         front_left_wheel = Llanta(obj.Position[0] - 10, obj.Position[2] - 10)

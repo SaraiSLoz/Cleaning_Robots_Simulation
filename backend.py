@@ -14,13 +14,19 @@ def create():
     games[id] = Maze()
     botlist = []
     garblist = []
+    inclist = []
     for agent in games[id].schedule.agents:
         if isinstance(agent, Bot):
             botlist.append(
                 {"id": agent.unique_id, "x": agent.pos[0], "z": agent.pos[1]})
-        elif isinstance(agent, Garbage):
+        elif isinstance(agent, Garbage) and agent.pos is not None:
             garblist.append(
                 {"id": agent.unique_id, "x": agent.pos[0], "z": agent.pos[1]})
+        elif isinstance(agent, Incinerator):
+            inclist.append(
+                {"id": agent.unique_id,
+                    "x": agent.pos[0], "z": agent.pos[1], "condition": agent.condition}
+            )
 
     # response = flask.make_response()
     # response.headers['Location'] = f"/games/{id}"
@@ -28,7 +34,7 @@ def create():
     # response.data = jsonify(lista)
     # return response
 
-    agentlist = [botlist, garblist]
+    agentlist = [botlist, garblist, inclist]
     return jsonify(agentlist), 201, {'Location': f"/games/{id}"}
 
 
@@ -39,6 +45,7 @@ def queryState(id):
     model.step()
     botlist = []
     garblist = []
+    inclist = []
     for agent in games[id].schedule.agents:
         if isinstance(agent, Bot):
             botlist.append(
@@ -46,7 +53,12 @@ def queryState(id):
         elif isinstance(agent, Garbage) and agent.pos is not None:
             garblist.append(
                 {"id": agent.unique_id, "x": agent.pos[0], "z": agent.pos[1]})
-    agentlist = [botlist, garblist]
+        elif isinstance(agent, Incinerator):
+            inclist.append(
+                {"id": agent.unique_id,
+                    "x": agent.pos[0], "z": agent.pos[1], "condition": agent.condition}
+            )
+    agentlist = [botlist, garblist, inclist]
     return jsonify(agentlist), 201, {'Location': f"/games/{id}"}
 
 

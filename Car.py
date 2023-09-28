@@ -29,7 +29,7 @@ class Car:
             -1, 1, 1,  -1, 1, -1,  -1, -1, -1,  -1, -1, 1]
 
         #self.DimBoard = dim
-        self.Position = (posx, 1, posz)
+        self.Position = (posx, 11, posz)
         self.Direction = [random.uniform(-1, 1), 0, random.uniform(-1, 1)]
         self.normalize(self.Direction)
         #self.scale(self.Direction, vel)
@@ -59,7 +59,7 @@ class Car:
         self.basura_recogida = basura_id
 
     def update(self, posx, posz):
-        self.Position = (posx, 1, posz)
+        self.Position = (posx, 11, posz)
 
         ''' if not self.ocupado:
              new_position = [self.Position[0] + self.Direction[0],
