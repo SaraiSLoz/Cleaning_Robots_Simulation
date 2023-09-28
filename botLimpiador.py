@@ -95,8 +95,8 @@ class Bot(Agent):
 
         # aux = self.pos
 
-        middle_x = self.model.grid.width // 2 + 1
-        middle_y = self.model.grid.height // 2 + 1 
+        middle_x = self.model.grid.width // 2
+        middle_y = self.model.grid.height // 2
         incineratorPosition = (middle_x, middle_y)
 
         pathgrid = Grid(matrix=Maze.matriz)
@@ -145,15 +145,21 @@ class Bot(Agent):
 
         elif self.condition == self.OCUPADO:
             newpos = self.moveToIncinerator()
+            print("I")
+            # error empieza aqui
             self.model.grid.move_agent(self, newpos)
+            print("H")
             self.model.grid.move_agent(self.garbage, newpos)
+            print("Z")
 
             for agent in agentList:
                 if isinstance(agent, Incinerator):
                     self.model.grid.move_agent(
                         self, (self.pos[0] + self.random.randint(0, 1), self.pos[1] + self.random.randint(0, 1)))
                     # Maze.matriz[self.pos] = 0
+                    print("hola")
                     self.garbage = None
+                    print("que tal")
                     self.condition = self.LIBRE
                     self.collectedGarbages += 1
                     break
@@ -178,7 +184,7 @@ class Maze(Model):
 
     matriz = []
 
-    def __init__(self, density=0.08, board_size_big=True, initial_dirty_percentage=0.2, max_steps=1000000000, max_execution_time=10000.0):
+    def __init__(self, density=0.01, board_size_big=True, initial_dirty_percentage=0.2, max_steps=1000, max_execution_time=2.0):
         super().__init__()
         self.schedule = BaseScheduler(self)
 
@@ -194,8 +200,8 @@ class Maze(Model):
         self.board_size_big = board_size_big
         self.update_grid_size()
 
-        middle_x_coord = (self.grid.width // 2) + 1
-        middle_y_coord = (self.grid.height // 2) + 1
+        middle_x_coord = self.grid.width // 2
+        middle_y_coord = self.grid.height // 2
         middle_coords_list = [(middle_x_coord, middle_y_coord)]
 
         for i in range(self.grid.width):

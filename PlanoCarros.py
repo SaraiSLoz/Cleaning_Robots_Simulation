@@ -2,7 +2,6 @@ import requests
 from Llanta import Llanta
 from Car import Car
 from Textures import Texture
-from incinerator import Incinerator
 import math
 import random
 from Basura import Basura
@@ -57,7 +56,6 @@ basuras_recogidas = []
 nbasuras = 25
 
 '''
-incinerator_lista = []
 textures = []
 
 # Variables para el movimiento del plano
@@ -120,8 +118,7 @@ def Init():
     print("Lista:0", lista[0])
 
     # print("\nLista:1", lista[1])
-    aux = Incinerator(0,0,15)
-    incinerator_lista.append(aux)
+
     for agent in lista[0]:
         car = Car(agent["x"]*factor-DimBoard,
                   agent["z"]*factor-DimBoard, textures)
@@ -163,7 +160,6 @@ def display():
 
     glDisable(GL_TEXTURE_2D)  # Deshabilita la textura
 
-    incinerator_lista[0].draw()
     for bs in basuras.values():
         glColor(1, 1, 1)
         bs.draw()
@@ -175,7 +171,7 @@ def display():
     for agent in lista[0]:
         bots[agent["id"]].update(
             agent["x"]*factor-DimBoard, agent["z"]*factor-DimBoard)
-        print(agent["x"], agent["z"])
+        print(agent["x"],agent["z"])
     for agent in lista[1]:
         basuras[agent["id"]].update(
             agent["x"]*factor-DimBoard, agent["z"]*factor-DimBoard)
