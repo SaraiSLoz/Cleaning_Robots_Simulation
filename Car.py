@@ -61,38 +61,7 @@ class Car:
     def update(self, posx, posz):
         self.Position = (posx, 11, posz)
 
-        ''' if not self.ocupado:
-             new_position = [self.Position[0] + self.Direction[0],
-                             self.Position[1], self.Position[2] + self.Direction[2]]
-
-             # Verifica si la nueva posición está dentro del borde del plano
-             if -self.DimBoard < new_position[0] < self.DimBoard and -self.DimBoard < new_position[2] < self.DimBoard:
-                 self.Position = new_position
-             else:
-                 # El carro ha colisionado con el borde del plano, cambia de dirección en un ángulo aleatorio entre 90 y 150 grados
-                 # Ángulo aleatorio en radianes
-                 angle = math.radians(random.uniform(90, 150))
-                 cos_a = math.cos(angle)
-                 sin_a = math.sin(angle)
-
-                 # Aplica la rotación en el plano XY
-                 new_direction_x = self.Direction[0] * \
-                     cos_a - self.Direction[2] * sin_a
-                 new_direction_z = self.Direction[0] * \
-                     sin_a + self.Direction[2] * cos_a
-
-                 self.Direction = [new_direction_x,
-                                   self.Direction[1], new_direction_z]
-         else:
-             # Si el robot está ocupado, dirige el carro al origen del plano
-             origin = [0, self.Position[1], 0]
-             direction_to_origin = [origin[0] - self.Position[0],
-                                    origin[1] - self.Position[1], origin[2] - self.Position[2]]
-             self.normalize(direction_to_origin)
-             self.Position[0] += direction_to_origin[0] * self.velocidad
-             self.Position[2] += direction_to_origin[2] * self.velocidad
- '''
-
+      
     def draw_colored_cube(self, x, y, z, s):
         glEnable(GL_TEXTURE_2D)  # Habilita la textura
         glBindTexture(GL_TEXTURE_2D, self.textures[1].id)  # Enlaza la textura

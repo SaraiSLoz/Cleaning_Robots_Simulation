@@ -1,5 +1,4 @@
 import requests
-from Llanta import Llanta
 from Car import Car
 from Textures import Texture
 import math
@@ -206,44 +205,6 @@ def display():
                 del basuras[agent_id]
 
                 # Update the basura's position
-
-    '''# Crea y dibuja las cuatro llantas debajo del carro
-        front_left_wheel = Llanta(obj.Position[0] - 10, obj.Position[2] - 10)
-        front_right_wheel = Llanta(obj.Position[0] - 10, obj.Position[2] + 10)
-        rear_left_wheel = Llanta(obj.Position[0] + 10, obj.Position[2] - 10)
-        rear_right_wheel = Llanta(obj.Position[0] + 10, obj.Position[2] + 10)
-
-        front_left_wheel.draw()
-        front_right_wheel.draw()
-        rear_left_wheel.draw()
-        rear_right_wheel.draw()
-
-        # Actualiza la posición de las llantas junto con el carro
-        front_left_wheel.update(obj.Position)
-        front_right_wheel.update(obj.Position)
-        rear_left_wheel.update(obj.Position)
-        rear_right_wheel.update(obj.Position)'''
-
-
-'''
-        for basura in basuras:
-            if (abs(obj.Position[0]) < 1 or abs(obj.Position[2]) < 1) and basura.id == obj.basura_recogida and obj.check_collision(basura):
-                basuras.remove(basura)
-                obj.ocupado = False  # El robot ya no está ocupado
-
-            if not obj.ocupado and obj.check_collision(basura) and basura.id not in basuras_recogidas:
-                new_basura_y = obj.Position[1] + obj.Size / 2 + basura.Size / 2
-                basura.Position = [obj.Position[0],
-                                   new_basura_y, obj.Position[2]]
-                # Marcar al robot como ocupado y pasar el ID de la basura
-                obj.recoger_basura(basura.id)
-                basuras_recogidas.append(basura.id)
-
-            if basura.id == obj.basura_recogida and obj.check_collision(basura):
-                new_basura_y = obj.Position[1] + obj.Size / 2 + basura.Size / 2
-                basura.Position = [obj.Position[0],
-                                   new_basura_y, obj.Position[2]]
-'''
 
 
 def main():

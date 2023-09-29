@@ -96,7 +96,7 @@ class Bot(Agent):
         # aux = self.pos
 
         middle_x = self.model.grid.width // 2 + 1
-        middle_y = self.model.grid.height // 2 + 1 
+        middle_y = self.model.grid.height // 2 + 1
         incineratorPosition = (middle_x, middle_y)
 
         pathgrid = Grid(matrix=Maze.matriz)
@@ -216,10 +216,10 @@ class Maze(Model):
         bot_1 = Bot(self, (0, 0))
         self.matriz[0][0] = 1
         bot_2 = Bot(self, (0, self.grid.width - 1))
-        # bot_3 = Bot(self, (self.grid.height - 1, 0))
-        # bot_4 = Bot(self, (self.grid.height - 1, self.grid.width - 1))
-        # bot_5 = Bot(self, None)
-        # bot_6 = Bot(self, None)
+        bot_3 = Bot(self, (self.grid.height - 1, 0))
+        bot_4 = Bot(self, (self.grid.height - 1, self.grid.width - 1))
+        bot_5 = Bot(self, (15, 10))
+        #bot_6 = Bot(self, None)
 
         Bot.displayListOfCleaners()
         for bot in Bot.cleaner_bots_list:
@@ -290,68 +290,3 @@ class Maze(Model):
         self.current_step += 1
 
 # Se crea la función que caracteriza a los agentes, en este caso agregamos imágenes y círculos
-
-
-'''
-def agent_portrayal(agent):
-    if isinstance(agent, Bot):
-        return {"Shape": "bot.png", "Layer": 0}
-    elif isinstance(agent, Garbage):
-        return {"Shape": "circle", "Filled": "true", "r": 1, "Color": "black", "Layer": 0}
-    elif isinstance(agent, Incinerator):
-        if agent.condition == Incinerator.NOT_BURNING:
-            return {"Shape": "basurero.png", "Layer": 0}
-        elif agent.condition == Incinerator.BURNING:
-            if time.time() - agent.burning_time <= agent.burning_duration:
-                return {"Shape": "circle", "Filled": "true", "r": 1, "Color": "red", "Layer": 0}
-            else:
-                return {"Shape": "basurero.png", "Layer": 0}
-
-# Función para determinar dimensiones del tablero
-
-
-def get_grid_size(board_size_big):
-    if board_size_big:
-        return 51, 51
-    else:
-        return 21, 21
-
-
-# Actualiza el tamaño del tablero y reinicia la simulación en las nuevas dimensiones
-def update_grid_size(change):
-    global grid
-    board_size_big = change["new"]
-    height, width = get_grid_size(board_size_big)
-    grid = CanvasGrid(agent_portrayal, height, width, 500, 500)
-
-    server.quit()
-    server.launch()
-
-
-initial_board_size_big = True  # tablero grande al inicio
-initial_height, initial_width = get_grid_size(
-    initial_board_size_big)  # tablero de 51x51 al inicio
-grid = CanvasGrid(agent_portrayal, initial_height, initial_width,
-                  500, 500)  # se crea tablero de visualización
-
-
-chart = ChartModule([{"Label": "Porcentaje de Basura Quemada",
-                    "Color": "Black"}], data_collector_name='datacollector')
-
-# Se crea la visualizacion
-if __name__ == "__main__":
-    density = 0.2
-    board_size_big = True
-    max_steps = "max_steps"
-    max_execution_time = 2.0  # Valor inicial del tiempo de ejecución en minutos
-
-    server = ModularServer(Maze, [grid, chart], "Cleaning Simulation", {
-        "density": Slider("Garbage Density", 0.2, 0.01, 1.0, 0.01),
-        "board_size_big": Checkbox("Use Big Grid (51x51)", board_size_big),
-        "max_steps": Slider("Max Steps", 1000, 1, 1000, 1),
-        "max_execution_time": Slider("Max Execution Time (min)", max_execution_time, 0.1, 5.0, 0.1)
-    })
-
-    server.port = 5100
-    server.launch()
-'''

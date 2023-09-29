@@ -106,7 +106,7 @@ class Basura:
         glTranslatef(basura.Position[0], basura.Position[1], basura.Position[2])
         glScaled(20, 20, 20)
             
-        basura.draw_textured_trash(0, 0, 0, 0.4)
+        basura.draw_textured_trash(0, 0, 0, 0.2)
         glPopMatrix()
         
     
